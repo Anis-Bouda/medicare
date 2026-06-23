@@ -1,0 +1,2 @@
+modele,accuracy,precision_high,recall_high,f1_high,precision_low,recall_low,f1_low
+Majority Baseline maison,0.7188250085724083,0.7188250085724083,1.0,0.8364144168107461,0.0,0.0,0.0

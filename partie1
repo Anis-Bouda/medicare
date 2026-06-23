@@ -1,0 +1,521 @@
+Vérification des données dans PostgreSQL
+
+hypertension_db=> CREATE TABLE patients_hypertension (
+    id SERIAL PRIMARY KEY,
+    country VARCHAR(100),
+    age INT,
+    bmi FLOAT,
+    cholesterol INT,
+    systolic_bp INT,
+    diastolic_bp INT,
+    smoking_status VARCHAR(50),
+    alcohol_intake FLOAT,
+    physical_activity_level VARCHAR(50),
+    family_history VARCHAR(10),
+    diabetes VARCHAR(10),
+    stress_level INT,
+    salt_intake FLOAT,
+    sleep_duration FLOAT,
+    heart_rate INT,
+    ldl INT,
+    hdl INT,
+    triglycerides INT,
+    glucose INT,
+    gender VARCHAR(20),
+    education_level VARCHAR(50),
+    employment_status VARCHAR(50),
+    hypertension VARCHAR(10)
+);
+
+
+hypertension_db=> \copy patients_hypertension (
+    country,
+    age,
+    bmi,
+    cholesterol,
+    systolic_bp,
+    diastolic_bp,
+    smoking_status,
+    alcohol_intake,
+    physical_activity_level,
+    family_history,
+    diabetes,
+    stress_level,
+    salt_intake,
+    sleep_duration,
+    heart_rate,
+    ldl,
+    hdl,
+    triglycerides,
+    glucose,
+    gender,
+    education_level,
+    employment_status,
+    hypertension
+)
+FROM '/home/anis/hypertension/hypertension_dataset.csv'
+DELIMITER ','
+CSV HEADER;
+COPY 174982
+
+//// Vérification du nombre total de lignes ////
+hypertension_db=> SELECT COUNT(*) FROM patients_hypertension;
+ count  
+--------
+ 174982
+(1 row)
+
+//// Vérification de la répartition de la variable cible ////
+hypertension_db=> SELECT hypertension, COUNT(*)
+FROM patients_hypertension
+GROUP BY hypertension;
+ hypertension | count  
+--------------+--------
+ High         | 125781
+ Low          |  49201
+(2 rows)
+
+///// Vérification des colonnes et de leurs types ////
+hypertension_db=> SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'patients_hypertension';
+       column_name       |     data_type     
+-------------------------+-------------------
+ id                      | integer
+ alcohol_intake          | double precision
+ stress_level            | integer
+ salt_intake             | double precision
+ sleep_duration          | double precision
+ heart_rate              | integer
+ ldl                     | integer
+ hdl                     | integer
+ triglycerides           | integer
+ glucose                 | integer
+ age                     | integer
+ bmi                     | double precision
+ cholesterol             | integer
+ systolic_bp             | integer
+ diastolic_bp            | integer
+ country                 | character varying
+ family_history          | character varying
+ diabetes                | character varying
+ gender                  | character varying
+ education_level         | character varying
+ employment_status       | character varying
+ smoking_status          | character varying
+ hypertension            | character varying
+ physical_activity_level | character varying
+(24 rows)
+
+//// Vérification de l’ordre des colonnes ////
+hypertension_db=> SELECT ordinal_position, column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'patients_hypertension'
+ORDER BY ordinal_position;
+ ordinal_position |       column_name       |     data_type     
+------------------+-------------------------+-------------------
+                1 | id                      | integer
+                2 | country                 | character varying
+                3 | age                     | integer
+                4 | bmi                     | double precision
+                5 | cholesterol             | integer
+                6 | systolic_bp             | integer
+                7 | diastolic_bp            | integer
+                8 | smoking_status          | character varying
+                9 | alcohol_intake          | double precision
+               10 | physical_activity_level | character varying
+               11 | family_history          | character varying
+               12 | diabetes                | character varying
+               13 | stress_level            | integer
+               14 | salt_intake             | double precision
+               15 | sleep_duration          | double precision
+               16 | heart_rate              | integer
+               17 | ldl                     | integer
+               18 | hdl                     | integer
+               19 | triglycerides           | integer
+               20 | glucose                 | integer
+               21 | gender                  | character varying
+               22 | education_level         | character varying
+               23 | employment_status       | character varying
+               24 | hypertension            | character varying
+(24 rows)
+
+
+//// Vérification des valeurs nulles ////
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE hypertension IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE id IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE country IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE age IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE bmi IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE cholesterol IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE systolic_bp IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE diastolic_bp IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE smoking_status IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE alcohol_intake IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE physical_activity_level IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE family_history IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE diabetes IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE stress_level IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE salt_intake IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE sleep_duration IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE heart_rate IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE ldl IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE hdl IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE triglycerides IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE glucose IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE gender IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE education_level IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE employment_status IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+hypertension_db=> SELECT COUNT(*) AS valeurs_nulles_hypertension
+FROM patients_hypertension
+WHERE hypertension IS NULL;
+ valeurs_nulles_hypertension 
+-----------------------------
+                           0
+(1 row)
+
+//// Vérification des valeurs possibles de la variable cible ////
+hypertension_db=> SELECT DISTINCT hypertension
+FROM patients_hypertension;
+ hypertension 
+--------------
+ High
+ Low
+(2 rows)
+
+//// Vérification du nombre de pays ////
+hypertension_db=> SELECT COUNT(DISTINCT country) AS nombre_pays
+FROM patients_hypertension;
+ nombre_pays 
+-------------
+          20
+(1 row)
+
+//// Affichage de la liste des pays ////
+hypertension_db=> SELECT DISTINCT country
+FROM patients_hypertension
+ORDER BY country;
+   country    
+--------------
+ Argentina
+ Australia
+ Brazil
+ Canada
+ China
+ France
+ Germany
+ India
+ Indonesia
+ Italy
+ Japan
+ Mexico
+ Russia
+ Saudi Arabia
+ South Africa
+ South Korea
+ Spain
+ Turkey
+ UK
+ USA
+(20 rows)
+
+//// Vérification des doublons ////
+hypertension_db=> SELECT 
+    country, age, bmi, cholesterol, systolic_bp, diastolic_bp,
+    smoking_status, alcohol_intake, physical_activity_level,
+    family_history, diabetes, stress_level, salt_intake,
+    sleep_duration, heart_rate, ldl, hdl, triglycerides,
+    glucose, gender, education_level, employment_status,
+    hypertension,
+    COUNT(*) AS nombre
+FROM patients_hypertension
+GROUP BY 
+    country, age, bmi, cholesterol, systolic_bp, diastolic_bp,
+    smoking_status, alcohol_intake, physical_activity_level,
+    family_history, diabetes, stress_level, salt_intake,
+    sleep_duration, heart_rate, ldl, hdl, triglycerides,
+    glucose, gender, education_level, employment_status,
+    hypertension
+HAVING COUNT(*) > 1;
+
+ country | age | bmi | cholesterol | systolic_bp | diastolic_bp | smoking_status | alcohol_intake | physical_activity_level | family_history | diabetes | stress_level | salt_intake | sleep_duration | heart_rate | ldl | hdl | triglycerides | glucose | gender | education_level | employment_status | hypertension | nombre 
+---------+-----+-----+-------------+-------------+--------------+----------------+----------------+-------------------------+----------------+----------+--------------+-------------+----------------+------------+-----+-----+---------------+---------+--------+-----------------+-------------------+--------------+--------
+(0 rows)
+
+//// Calcul du pourcentage des classes High et Low ////
+hypertension_db=> SELECT 
+    hypertension,
+    COUNT(*) AS nombre,
+    ROUND(COUNT(*) * 100 / (SELECT COUNT(*) FROM patients_hypertension), 2) AS pourcentage
+FROM patients_hypertension
+GROUP BY hypertension;
+ hypertension | nombre | pourcentage 
+--------------+--------+-------------
+ High         | 125781 |       71.00
+ Low          |  49201 |       28.00
+(2 rows)
+
+//// Nombre d’individus par pays ////
+hypertension_db=> SELECT country, COUNT(*) AS nombre_patients
+FROM patients_hypertension
+GROUP BY country
+ORDER BY nombre_patients DESC;
+   country    | nombre_patients 
+--------------+-----------------
+ Saudi Arabia |            8931
+ Russia       |            8857
+ South Africa |            8835
+ USA          |            8797
+ Italy        |            8794
+ Brazil       |            8783
+ Argentina    |            8773
+ South Korea  |            8761
+ Turkey       |            8759
+ India        |            8745
+ Germany      |            8743
+ Japan        |            8743
+ France       |            8738
+ Indonesia    |            8723
+ UK           |            8712
+ Australia    |            8711
+ Spain        |            8701
+ Mexico       |            8659
+ Canada       |            8632
+ China        |            8585
+(20 rows)
+
+//// Taux de risque élevé d’hypertension par pays ////
+hypertension_db=> SELECT 
+    country,
+    ROUND(
+        SUM(CASE WHEN hypertension = 'High' THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        2
+    ) AS taux_high
+FROM patients_hypertension
+GROUP BY country
+ORDER BY taux_high DESC;
+   country    | taux_high 
+--------------+-----------
+ Brazil       |     72.42
+ Germany      |     72.18
+ Indonesia    |     72.17
+ Japan        |     72.13
+ Italy        |     72.09
+ South Africa |     72.08
+ Mexico       |     71.95
+ China        |     71.89
+ Russia       |     71.89
+ India        |     71.88
+ Canada       |     71.86
+ Turkey       |     71.85
+ South Korea  |     71.83
+ France       |     71.82
+ Saudi Arabia |     71.82
+ USA          |     71.80
+ Australia    |     71.78
+ UK           |     71.68
+ Spain        |     71.57
+ Argentina    |     70.96
+(20 rows)
+
+//// Taux de risque faible d’hypertension par pays ////
+hypertension_db=> SELECT 
+    country,
+    ROUND(
+        SUM(CASE WHEN hypertension = 'Low' THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        2
+    ) AS taux_low
+FROM patients_hypertension
+GROUP BY country
+ORDER BY taux_low DESC;
+   country    | taux_low
+--------------+-----------
+ Argentina    |     29.04
+ Spain        |     28.43
+ UK           |     28.32
+ Australia    |     28.22
+ USA          |     28.20
+ France       |     28.18
+ Saudi Arabia |     28.18
+ South Korea  |     28.17
+ Turkey       |     28.15
+ Canada       |     28.14
+ India        |     28.12
+ Russia       |     28.11
+ China        |     28.11
+ Mexico       |     28.05
+ South Africa |     27.92
+ Italy        |     27.91
+ Japan        |     27.87
+ Indonesia    |     27.83
+ Germany      |     27.82
+ Brazil       |     27.58
+(20 rows)
