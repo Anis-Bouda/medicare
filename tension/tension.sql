@@ -1,0 +1,26 @@
+CREATE TABLE tension (
+    country TEXT,
+    age INT,
+    bmi NUMERIC(4,1),
+    cholesterol INT,
+    systolic_bp INT,
+    diastolic_bp INT,
+    smoking_status TEXT,
+    alcohol_intake NUMERIC(4,2),
+    physical_activity_level TEXT,
+    family_history TEXT,
+    diabetes TEXT,
+    stress_level INT,
+    salt_intake NUMERIC(5,2),
+    sleep_duration NUMERIC(4,2),
+    heart_rate INT,
+    ldl INT,
+    hdl INT,
+    triglycerides INT,
+    glucose INT,
+    gender TEXT,
+    education_level TEXT,
+    employment_status TEXT,
+    hypertension TEXT
+);
+
