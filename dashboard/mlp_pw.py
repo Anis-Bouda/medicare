@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
-
 import numpy as np
 import logging
 from donnees import charger_donnees
@@ -10,12 +9,11 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 import torch.optim as optim
 from sklearn.metrics import accuracy_score, roc_auc_score
-from sklearn.metrics import accuracy_score, roc_auc_score
 
 from outils_resultats import enregistrer_resultats
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-
+import os, joblib
 logging.getLogger("streamlit").setLevel(logging.ERROR)
 
 # on récup3re les données depuis Postgresql
@@ -141,3 +139,9 @@ print(confusion_matrix(y_test, pred_test))
 
 
 enregistrer_resultats("MLP (pos_weight)", y_test, pred_test, proba_test)
+
+#on sauvgardes les res pour les poredictions 
+os.makedirs("artefacts", exist_ok=True)
+torch.save(model.state_dict(), "artefacts/mlp_pw.pth")
+joblib.dump({"d": d, "m": 32}, "artefacts/mlp_pw_config.pkl")
+print("MLP pos_weight sauvegardé")

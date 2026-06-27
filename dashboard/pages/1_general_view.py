@@ -1,6 +1,18 @@
 import streamlit as st
 from sklearn.model_selection import train_test_split
 from donnees import charger_donnees
+from style import appliquer_style, entete
+
+
+
+
+if "user" not in st.session_state:
+    st.warning("🔒 Connecte-toi d'abord depuis la page d'accueil.")
+    st.stop()
+  
+appliquer_style()                     
+entete("📊 Analyse", "Exploration des données")  
+
 
 st.title("Vue générale du dataset")
 st.caption("Aperçu global et exploration des paquets train / dev / test")

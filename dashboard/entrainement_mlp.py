@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
-
+import os, joblib
 import numpy as np
 import logging
 from donnees import charger_donnees
@@ -165,3 +165,11 @@ for m, lr in itertools.product(grille_m, grille_lr):
 best = max(resultats, key=lambda r: r[2])    
 print(f"\nMeilleure combinaison (dev) : m={best[0]}, lr={best[1]} "
       f"-> acc={best[2]:.4f}, auc={best[3]:.4f}")
+
+# sauvegarde des artefacts pour prediction et comparaision
+
+os.makedirs("artefacts/modeles", exist_ok=True)
+joblib.dump(preprocessor, "artefacts/preprocessor.pkl")
+torch.save(model.state_dict(), "artefacts/mlp.pth")
+joblib.dump({"d": d, "m": 32}, "artefacts/mlp_config.pkl")
+print("Artefacts MLP sauvegardés dans artefacts/")

@@ -5,7 +5,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import plotly.graph_objects as go
+from style import appliquer_style, entete
 
+if "user" not in st.session_state:
+    # pas connecte écran de login    
+    st.warning(" Connecte-toi d'abord depuis la page d'accueil.")
+    st.stop()  
+
+appliquer_style()                     
+entete("📊 Analyse", "Exploration des données")  
 st.title("Comparaison des modèles")
 
 FICHIER = "resultats/metrics.csv"
@@ -46,6 +54,24 @@ fig.add_bar(name="recall High", x=df["modele"], y=df["recall_high"], marker_colo
 fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
                   barmode="group", yaxis_range=[0, 1])
 st.plotly_chart(fig, use_container_width=True, key="recall")
+
+# F1-score moyen macro pour chqu model
+st.subheader("F1-score moyen (moyenne des 2 classes)")
+fig = px.bar(df, x="modele", y="f1", color_discrete_sequence=["#5AA9C9"])
+fig.add_hline(y=0.5, line_dash="dash", line_color="red",
+              annotation_text="hasard (0.50)")
+fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                  yaxis_range=[0, 1], xaxis_title="", yaxis_title="F1 macro")
+fig.update_xaxes(tickangle=-30)
+st.plotly_chart(fig, use_container_width=True, key="f1")
+
+# Précision moyenne  pour chaque modele
+st.subheader("Précision moyenne (moyenne des 2 classes)")
+fig = px.bar(df, x="modele", y="precision", color_discrete_sequence=["#6a4c93"])
+fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                  yaxis_range=[0, 1], xaxis_title="", yaxis_title="Précision macro")
+fig.update_xaxes(tickangle=-30)
+st.plotly_chart(fig, use_container_width=True, key="precision")
 
 # LES MATRICE DE CONFUSIONNNNN
 st.subheader("Matrices de confusion (TP / FP / FN / TN)")

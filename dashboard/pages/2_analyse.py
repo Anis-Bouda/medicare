@@ -3,8 +3,18 @@ from donnees import charger_donnees
 import plotly.express as px
 import pandas as pd
 
-st.title("Analyse exploratoire")
+from style import appliquer_style, entete
 
+
+if "user" not in st.session_state:
+    # pas connecte ecran de login    
+    st.warning(" Connecte-toi d'abord depuis la page d'accueil.")
+    st.stop()  
+
+appliquer_style()                     
+entete("📊 Analyse", "Exploration des données")  
+st.title(" Prédiction du risque d'hypertension")
+    
 df = charger_donnees()
 #crer des onglets clicable en haut de page 
 tab1, tab2, tab3, tab4 = st.tabs(["Repartition", "Pays", "Âge", "Facteurs"])
