@@ -158,7 +158,7 @@ def page_dashboard():
                 font-weight:700; margin-bottom:20px;">{role_txt}</div>
     """, unsafe_allow_html=True)
 
-    # affichage des donne importantes 
+    # affichage des donne importantes
     df = charger_donnees()
     n_patients = f"{len(df):,}".replace(",", " ")
     n_var = df.shape[1] - 1
@@ -178,12 +178,12 @@ def page_dashboard():
 
     # navifateur pour cahque fonctionalite 
     n1, n2 = st.columns(2)
-    n1.markdown(carte_nav("Analyse", "Graphiques : répartition, pays, âge, facteurs de risque"), unsafe_allow_html=True)
-    n2.markdown(carte_nav( "Modèles", "Comparaison des performances des 9 modèles"), unsafe_allow_html=True)
+    n1.markdown(carte_nav("📊","Analyse", "Graphiques : répartition, pays, âge, facteurs de risque"), unsafe_allow_html=True)
+    n2.markdown(carte_nav(" 🤖","Modèles", "Comparaison des performances des 9 modèles"), unsafe_allow_html=True)
     st.write("")
     n3, n4 = st.columns(2)
-    n3.markdown(carte_nav("Prédiction", "Estimer le risque d'un patient individuel"), unsafe_allow_html=True)
-    n4.markdown(carte_nav( "Vue générale", "Aperçu du dataset et des paquets train/dev/test"), unsafe_allow_html=True)
+    n3.markdown(carte_nav("🔮","Prédiction", "Estimer le risque d'un patient individuel"), unsafe_allow_html=True)
+    n4.markdown(carte_nav( "📋","Vue générale", "Aperçu du dataset et des paquets train/dev/test"), unsafe_allow_html=True)
 
     # petit affichage si luser est un dev 
     if user["role"] == "dev":
