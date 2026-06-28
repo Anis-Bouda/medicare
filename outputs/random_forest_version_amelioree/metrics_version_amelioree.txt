@@ -1,0 +1,24 @@
+Meilleurs parametres : {'max_depth': 18, 'min_samples_leaf': 12, 'max_features': 0.7, 'max_samples': 0.5, 'class_weight': 'balanced'}
+Seuil High selectionne : 0.50
+
+Resultats finaux sur Dtest
+accuracy: 0.5823
+balanced_accuracy: 0.4972
+precision_high: 0.7172
+recall_high: 0.6916
+f1_high: 0.7042
+precision_low: 0.2775
+recall_low: 0.3028
+f1_low: 0.2896
+macro_f1: 0.4969
+roc_auc: 0.4945
+
+Rapport de classification Dtest
+              precision    recall  f1-score   support
+
+        High       0.72      0.69      0.70     18868
+         Low       0.28      0.30      0.29      7380
+
+    accuracy                           0.58     26248
+   macro avg       0.50      0.50      0.50     26248
+weighted avg       0.59      0.58      0.59     26248
