@@ -4,18 +4,11 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-import plotly.graph_objects as go
-from style import appliquer_style, entete
+from style import appliquer_style, entete, verifier_role
 
-if "user" not in st.session_state:
-    # pas connecte écran de login    
-    st.warning(" Connecte-toi d'abord depuis la page d'accueil.")
-    st.stop()  
-
-appliquer_style()                     
-entete("📊 Analyse", "Exploration des données")  
-st.title("Comparaison des modèles")
-
+appliquer_style()
+verifier_role(["patient", "dev", "medecin"])
+entete("🤖 Comparaison des modèles", "Performances des 9 modèles")
 FICHIER = "resultats/metrics.csv"
 
 # on lit le fichier metrics cest la ou il ya les resultat
@@ -28,7 +21,7 @@ df = pd.read_csv(FICHIER).sort_values("auc", ascending=False)
 st.subheader("Tableau comparatif")
 st.dataframe(df, use_container_width=True, hide_index=True)
 
-# accuracy + AUC côte à côte
+# accuracy et AUC
 st.subheader("Scores")
 c1, c2 = st.columns(2)
 
