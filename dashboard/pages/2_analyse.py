@@ -2,19 +2,12 @@ import streamlit as st
 from donnees import charger_donnees
 import plotly.express as px
 import pandas as pd
+from style import appliquer_style, entete, verifier_role
 
-from style import appliquer_style, entete
-
-
-if "user" not in st.session_state:
-    # pas connecte ecran de login    
-    st.warning(" Connecte-toi d'abord depuis la page d'accueil.")
-    st.stop()  
-
-appliquer_style()                     
-entete("📊 Analyse", "Exploration des données")  
-st.title(" Prédiction du risque d'hypertension")
-    
+appliquer_style()
+#tous le monde peut y acceder 
+verifier_role(["patient", "dev", "medecin"])   
+entete("📊 Analyse", "Exploration des données")
 df = charger_donnees()
 #crer des onglets clicable en haut de page 
 tab1, tab2, tab3, tab4 = st.tabs(["Repartition", "Pays", "Âge", "Facteurs"])
@@ -34,7 +27,7 @@ with tab1:
     textinfo="label+percent",
     hovertemplate="<b>%{label}</b><br>%{value} patients<br>%{percent}<extra></extra>",
 )
-    #envoie le raph a stimlit 
+    #envoie le graph a stimlit 
     st.plotly_chart(fig, use_container_width=True, key="general_view")
 with tab2:
     st.subheader("Analyse par pays")
