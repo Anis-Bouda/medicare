@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+figures/
+outputs/
+artefacts/modeles/Random Forest.pkl
+justificatifs/
+avis_fichiers/
+email_utils.py
+.DS_Store
+dashboard.zip
+test_ui.py
