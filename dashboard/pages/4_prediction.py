@@ -4,16 +4,13 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import streamlit as st
+import xgboost
 from donnees import charger_donnees
-from style import appliquer_style, entete
-import xgboost   
-if "user" not in st.session_state:
-    # pas connecte écran de login    
-    st.warning(" Connecte-toi d'abord depuis la page d'accueil.")
-    st.stop()  
+from style import appliquer_style, entete, verifier_role
 
-appliquer_style()                     
-entete(" Prédiction du risque d'hypertension")  
+appliquer_style()
+verifier_role(["patient", "dev", "medecin"])
+entete(" Prédiction du risque d'hypertension")
 st.caption("Saisis les infos d'un patient — les modèles donnent leur avis.")
 
 class MLP(nn.Module):
