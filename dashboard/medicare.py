@@ -1,13 +1,17 @@
 import streamlit as st
 from auth import inscrire, connecter
 from donnees import charger_donnees
+from style import appliquer_style, carte_kpi, carte_nav ,entete
+from auth import lister_demandes, valider_role, refuser_role
+from email_utils import envoyer_email
+import os
 
 st.set_page_config(page_title="Medicare - Hypertension", layout="wide",
                    initial_sidebar_state="collapsed")
 
-# ============================================================== #
-#   STYLE (CSS personnalisé)
-# ============================================================== #
+
+# css du dashbord 
+
 st.markdown("""
 <style>
 .block-container { padding-top: 2rem; }
@@ -109,12 +113,35 @@ def page_login():
                 new_id = st.text_input("Choisis un identifiant", key="in_id")
                 new_nom = st.text_input("Ton nom", key="in_nom")
                 new_mdp = st.text_input("Mot de passe", type="password", key="in_mdp")
-                role = st.selectbox("Type de compte", ["patient", "dev"], key="in_role")
+                role_demande = st.selectbox("Type de compte",
+                    ["patient", "dev", "medecin"], key="in_role")
+
+                # emial et justificatif si cets un dev ou med
+                new_email = ""
+                fichier_just = None
+                if role_demande in ("dev", "medecin"):
+                    st.caption("Pour une demande dev/médecin, un email et un justificatif "
+                               "sont requis. Tu recevras ton code d'activation par email.")
+                    new_email = st.text_input("Ton email (pour recevoir le code)", key="in_email")
+                    fichier_just = st.file_uploader("Justificatif (PDF ou image)",
+                        type=["pdf", "png", "jpg", "jpeg"], key="in_file")
+
                 if st.button("Créer mon compte", key="btn_in", use_container_width=True):
                     if not new_id or not new_mdp or not new_nom:
                         st.warning("Remplis tous les champs.")
+                    elif role_demande in ("dev", "medecin") and not new_email:
+                        st.warning("L'email est obligatoire pour recevoir ton code.")
+                    elif role_demande in ("dev", "medecin") and fichier_just is None:
+                        st.warning("Le justificatif est obligatoire.")
                     else:
-                        ok, msg = inscrire(new_id, new_nom, new_mdp, role)
+                        chemin = ""
+                        if fichier_just is not None:
+                            os.makedirs("justificatifs", exist_ok=True)
+                            chemin = f"justificatifs/{new_id}_{fichier_just.name}"
+                            with open(chemin, "wb") as f:
+                                f.write(fichier_just.getbuffer())
+                        demande = "" if role_demande == "patient" else role_demande
+                        ok, msg = inscrire(new_id, new_nom, new_mdp, new_email, demande, chemin)
                         if ok:
                             st.success(msg)
                         else:
@@ -123,19 +150,24 @@ def page_login():
         st.markdown('<div class="login-foot">🔒 Connexion sécurisée · mots de passe chiffrés</div>',
                     unsafe_allow_html=True)
 
-# ============================================================== 
-#   si on arrive a se connecter on lance le dashbord 
-# ============================================================== 
-def page_dashboard():
-    from style import appliquer_style, carte_kpi, carte_nav
 
-    # on reeafiche le menu a droite si lutilisateur a reussi a se connecter 
+#   si on arrive a se connecter on lance le dashbord 
+def page_dashboard():
+    user = st.session_state["user"]    
+
+    # bouton retour seulement pour l'admin
+    if user["role"] == "admin":
+        if st.button("🛡️ Retour console admin"):
+            st.session_state["admin_mode"] = "admin"
+            st.rerun()
+
+    # reafficher le menu de gauche
     st.markdown("""<style>
     section[data-testid="stSidebar"] { display: block !important; }
     </style>""", unsafe_allow_html=True)
 
     appliquer_style()
-    user = st.session_state["user"]
+    
 
     # entete du haut 
     c1, c2 = st.columns([4, 1])
@@ -148,9 +180,12 @@ def page_dashboard():
             del st.session_state["user"]
             st.rerun()
 
-    # les roles avec dev et patient avec des emoji pour rendre plus beau
-    role_txt = "🛠️ DÉVELOPPEUR" if user["role"] == "dev" else "👤 PATIENT"
-    couleur_role = "#8b5cf6" if user["role"] == "dev" else "#22d3ee"
+    # les roles avec une couleur et un emoji pour chaque rols
+    roles_aff = {"admin": ("🛡️ ADMIN", "#f43f5e"),
+                 "dev": ("🛠️ DÉVELOPPEUR", "#8b5cf6"),
+                 "medecin": ("👨‍⚕️ MÉDECIN", "#22c55e"),
+                 "patient": ("👤 PATIENT", "#22d3ee")}
+    role_txt, couleur_role = roles_aff.get(user["role"], ("👤 PATIENT", "#22d3ee"))
     st.markdown(f"""
     <div style="display:inline-block; background:rgba(139,92,246,0.15);
                 border:1px solid {couleur_role}; color:{couleur_role};
@@ -185,14 +220,76 @@ def page_dashboard():
     n3.markdown(carte_nav("🔮","Prédiction", "Estimer le risque d'un patient individuel"), unsafe_allow_html=True)
     n4.markdown(carte_nav( "📋","Vue générale", "Aperçu du dataset et des paquets train/dev/test"), unsafe_allow_html=True)
 
-    # petit affichage si luser est un dev 
+    # petit affichage si luser est un dev ou medecin 
     if user["role"] == "dev":
         st.markdown("###  ")
         st.info("🛠️ **Espace développeur** — accès à la gestion des modèles (menu de gauche).")
-# ============================================================== 
-#   redirection vers en utilisant les fonction 
-# ============================================================== 
+    elif user["role"] == "medecin":
+        st.markdown("###  ")
+        st.info("👨‍⚕️ **Espace médecin** — répondre aux demandes des patients (menu de gauche).")
+        
+def page_admin():
+   
+    # on cache le menu de gauche : l'admin a son interface dédiée
+    st.markdown("""<style>section[data-testid="stSidebar"]{display:none!important;}</style>""",
+                unsafe_allow_html=True)
+    appliquer_style()
+
+    user = st.session_state["user"]
+    c1, c2, c3 = st.columns([3, 1, 1])
+    with c1:
+        entete("🛡️ Console Admin", f"Connecté : {user['nom']}")
+    with c2:
+        st.write("")
+        if st.button("Déconnexion"):
+            del st.session_state["user"]
+            st.rerun()
+    with c3:
+        st.write("")
+        if st.button("voir dashbord ", use_container_width=True):
+            st.session_state["admin_mode"] = "dashboard"  
+            st.rerun()
+
+    demandes = lister_demandes()
+    if not demandes:
+        st.info("Aucune demande en attente pour le moment.")
+    else:
+        st.subheader(f"{len(demandes)} demande(s) en attente")
+        for d in demandes:
+            with st.container(border=True):
+                st.markdown(f"### {d['nom']} (`{d['identifiant']}`) — veut être **{d['role_demande']}**")
+                st.caption(f"📧 {d['email']}")
+                # le justificatif (téléchargeable)
+                if d["fichier"] and os.path.exists(d["fichier"]):
+                    with open(d["fichier"], "rb") as f:
+                        st.download_button("📎 Voir le justificatif", f,
+                            file_name=os.path.basename(d["fichier"]), key=f"dl_{d['id']}")
+                else:
+                    st.caption("⚠️ Pas de justificatif fourni")
+                # boutons valider / refuser
+                col1, col2 = st.columns(2)
+                if col1.button(" Valider", key=f"v_{d['id']}", use_container_width=True):
+                    code, email, nom, role = valider_role(d["id"])
+                    ok, msg = envoyer_email(email, f"Medicare - Validation {role}",
+                        f"Bonjour {nom},\n\nTa demande de role {role} a été acceptée !\n"
+                        f"Ton code d'activation : {code}\n\n"
+                        f"Connecte-toi et saisis ce code dans 'Activer mon role'.\n\nL'équipe Medicare")
+                    if ok:
+                        st.success(f" {nom} validé ({role}) ! Code envoyé par email.")
+                    else:
+                        st.warning(f"Validé mais email non envoyé : {msg}. Code : {code}")
+                    st.rerun()
+                if col2.button(" Refuser", key=f"r_{d['id']}", use_container_width=True):
+                    refuser_role(d["id"])
+                    st.info(f"Demande de {d['nom']} refusée.")
+                    st.rerun()
+
+# redirection vers les pages selon les roles 
+
 if "user" not in st.session_state:
     page_login()
+elif st.session_state["user"]["role"] == "admin" and st.session_state.get("admin_mode") != "dashboard":
+    page_admin()           # console admin par défaut
 else:
-    page_dashboard()
+    #quand un des user appuiss sur dashbord 
+    page_dashboard()       
