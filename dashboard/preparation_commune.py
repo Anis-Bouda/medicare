@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-
+import numpy as np
 #connexiion a la base 
 URL = "postgresql+psycopg2://boudaanis@localhost:5432/hypertension_db"
 
@@ -41,7 +41,6 @@ def preparer_donnees(numpy_out=True):
     X_test_p  = preprocessor.transform(X_test)
 
     if numpy_out:
-        import numpy as np
         return (np.asarray(X_train_p), np.asarray(X_dev_p), np.asarray(X_test_p),
                 y_train.values, y_dev.values, y_test.values, preprocessor)
     return X_train_p, X_dev_p, X_test_p, y_train, y_dev, y_test, preprocessor
